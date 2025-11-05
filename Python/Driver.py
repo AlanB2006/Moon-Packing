@@ -1,6 +1,5 @@
 n_moons = int(input("number of moons: "))
 moon_mass = input(" moon mass (L, C, P): ")
-# restart = input("Restart? (Y/N): ")
 
 def write_to_file(fname,f_str,head):
     lock.acquire()
@@ -156,11 +155,11 @@ for i in range(n_moons):
     header += "max e_m" + str(i+1) + ", "
 header += "sim finish time (n Pmoon), wall_time\n"
 write_to_file("output.txt", header, "head")
-# for i in range(0, n_moons):
-#   fname = "evolution%i.txt" % i
-#   with open(fname, "w") as outfile:
-#     outfile.write("#Time, Semimajor, Ecc, Distance\n")
-#     outfile.close()
+for i in range(0, n_moons):
+  fname = "evolution%i.txt" % i
+  with open(fname, "w") as outfile:
+    outfile.write("#Time, Semimajor, Ecc, Distance\n")
+    outfile.close()
 delta_rng = np.arange(8.59,8.60,0.1)
 # delta_rng = np.concatenate((np.arange(3.5,4.5,0.01), np.arange(6.9,7.2,0.01)))
 # for d in range(0,len(delta_rng)):

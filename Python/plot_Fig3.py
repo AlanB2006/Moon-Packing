@@ -1,4 +1,4 @@
-def Cart2Orb(ps0,ps1,mcen):
+def Cart2Orb(ps0,ps1,mcen): # Cartesian to Orbital
   ps_diff = ps1 - ps0
   tempsim = rebound.Simulation()
   tempsim.units = ('AU', 'yr', 'Msun')
@@ -22,11 +22,11 @@ fig, axes = plt.subplots(3, 3, figsize=(12, 6), dpi=150)
 for col, i in enumerate(tau):
     sa = rebound.Simulationarchive("" % i)
     npts = int(len(sa)/10)+1
-    semi = np.zeros((npts,2))
-    ecc = np.zeros((npts,2))
+    semi = np.zeros((npts,2)) # number of moons
+    ecc = np.zeros((npts,2))  # number of moons
     p1 = np.zeros(npts)
     p2 = np.zeros(npts)
-    t = np.zeros(npts)
+    t = np.zeros(npts) #time
 
     cnt = 0
     for j in range(0,len(sa),10):
@@ -45,8 +45,8 @@ for col, i in enumerate(tau):
     color = ['r','b']
     ylabels = ['$a\\ (R_H)$','$e$','$p_2/p_1$']
     ylims = [(1e-2,0.45),(1e-5, 1),(1,70)]
-    for m in range(2): #moon number
-        for r in range(3):
+    for m in range(2): # Change for number of moons.
+        for r in range(3): 3 # Number of rows.
             axes[r,col].minorticks_on()
             axes[r,col].tick_params(which='major',axis='both', direction='out',length = 6.0, width = 4.0)
             axes[r,col].tick_params(which='minor',axis='both', direction='out',length = 3.0, width = 2.0)
@@ -69,6 +69,7 @@ for col, i in enumerate(tau):
 
 fig.subplots_adjust(wspace=0.3)
 plt.show()
+# Optional for saving plot.
 # moon_name = input(" moon mass (L, C, P): ")
 # if moon_name == "L":
 #     filename = "Luna_Sa.png"

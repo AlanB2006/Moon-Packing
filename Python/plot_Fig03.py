@@ -1,142 +1,102 @@
-def Cart2Orb(ps0,ps1,mcen):
-  ps_diff = ps1 - ps0
-  tempsim = rebound.Simulation()
-  tempsim.units = ('AU', 'yr', 'Msun')
-  tempsim.add(m=mcen)
-  tempsim.add(m=0,x=ps_diff.x,y=ps_diff.y,z=ps_diff.z,vx=ps_diff.vx,vy=ps_diff.vy,vz=ps_diff.vz)
-  tempsim.move_to_com()
-  ps = tempsim.particles
-  return ps[1].a,ps[1].e,ps[1].d,ps[1].P
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+from scipy.constants import astronomical_unit
+from matplotlib.ticker import FixedLocator, NullFormatter
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
-earth_mass = 3.003e-6 #Solar M
-r_earth = 4.259e-5
-r_roche = 2.44*r_earth*(5.515/3.3)**(1/3.) #Roche Radius
-a_m = 2 * r_roche
-R_H = 1*(earth_mass/3)**(1/3.)
-Pmoon = np.sqrt(a_m**3/earth_mass) # Kepler 3rd Law
-M_moon = earth_mass/81. #Luna moon
-fs = 'x-large'
-tau = [1, 2, 3]
+lbl_fs = 'x-large'
+colors = ["r","b"]
+labels = ["m1", "m2"]
+tau = [0, 100, 698]
+sublbl = ['a','b', 'c', 'd', 'e','f']
+matplotlib.rcParams["pdf.compression"] = 9
+matplotlib.rcParams["savefig.dpi"] = 300
+fig, axes = plt.subplots(2, 3, figsize=(14, 6), dpi=300)
 
-nmoon = int(input(" number of moons: "))
-moon_name = input(" moon mass (L, C, P): ")
-
-fig, axes = plt.subplots(3, 3, figsize=(12, 6), dpi=150)
 for col, i in enumerate(tau):
-    sa = rebound.Simulationarchive("/content/drive/MyDrive/Case-Study/Luna/Simulation Archive/Tau_698/Luna_698!_%i.bin" % i)
-    npts = int(len(sa)/10)+1
-    semi = np.zeros((npts,nmoon))
-    ecc = np.zeros((npts,nmoon))
-    p1 = np.zeros(npts)
-    p2 = np.zeros(npts)
-    p3 = np.zeros(npts)
-    p4 = np.zeros(npts)
-    p5 = np.zeros(npts)
-    t = np.zeros(npts)
 
-    cnt = 0
-    for j in range(0,len(sa),10):
-        ps = sa[j].particles
-        if moon_name == "L":
-            moon1_semi, moon1_ecc, moon1_d, P1 = Cart2Orb(ps[1], ps[2], earth_mass + M_moon)
-            moon2_semi, moon2_ecc, moon2_d, P2 = Cart2Orb(ps[1], ps[3], earth_mass + M_moon)
-            ecc[cnt,0] = moon1_ecc
-            semi[cnt,0] = moon1_semi/R_H
-            p1[cnt] = P1
+    data = np.loadtxt("Luna_%i_final.txt" % i, delimiter=",", skiprows=1, usecols=(0, 2, 5, 8))
+    delta_H = data[:, 0]
+    time = data[:, 3]
 
-            semi[cnt,1] = moon2_semi/R_H
-            ecc[cnt,1] = moon2_ecc
-            p2[cnt] = P2
-        if moon_name == "P":
-            moon1_semi, moon1_ecc, moon1_d, P1 = Cart2Orb(ps[1], ps[2], earth_mass + M_moon)
-            moon2_semi, moon2_ecc, moon2_d, P2 = Cart2Orb(ps[1], ps[3], earth_mass + M_moon)
-            moon3_semi, moon3_ecc, moon3_d, P3 = Cart2Orb(ps[1], ps[4], earth_mass + M_moon)
-            moon4_semi, moon4_ecc, moon4_d, P4 = Cart2Orb(ps[1], ps[5], earth_mass + M_moon)
+    axes[0, col].scatter(delta_H, time, s=1, color="black")
+    axes[0, col].set_yscale("log")
+    axes[0, col].axvline(x=8.75, color='k', linestyle='dashed', linewidth=1)
+    axes[0, col].set_xlim(2 * np.sqrt(3), 9)
+    axes[0, col].set_ylim(1e3, 1.5e7)
+    axes[0, col].set_ylabel("$\\log_{10}{t}$" if col == 0 else "", fontsize=lbl_fs)
+    axes[0, col].minorticks_on()
+    axes[0, col].tick_params(which='both', direction='out', length=6, width=3, labelsize=12)
+    axes[0, col].tick_params(which='minor', direction='out', length=3, width=2)
+    axes[0, col].text(0.05, 0.9, sublbl[col], color='k', fontsize=15,
+                      weight='bold',horizontalalignment='left', transform=axes[0, col].transAxes)
+    if col != 0:
+        axes[0, col].tick_params(labelleft=False)
+        axes[1, col].tick_params(labelleft=False)
+    axes[0, col].tick_params(labelbottom=False)
 
-            ecc[cnt,0] = moon1_ecc
-            semi[cnt,0] = moon1_semi/R_H
-            p1[cnt] = P1
+    for j in range(1, 3):
+        e = data[:, j]
+        axes[1, col].scatter(delta_H, e,
+            s=2,color=colors[j-1],label=labels[j-1])
+    axes[1, col].set_yscale("log")
+    axes[1, col].set_xlim(2 * np.sqrt(3), 9)
+    axes[1, col].set_ylim(1e-3, 1.3)
+    axes[1, col].set_ylabel("$e_{max}$" if col == 0 else "",fontsize=lbl_fs)
+    axes[1, col].minorticks_on()
+    axes[1, col].tick_params(which='both', direction='out', length=6, width=3, labelsize=12)
+    axes[1, col].tick_params(which='minor', direction='out', length=3, width=2)
+    axes[1, col].text(0.05, 0.9, sublbl[3 + col], color='k', fontsize=15,
+                    weight='bold',horizontalalignment='left', transform=axes[1, col].transAxes)
+    axes_top = axes[0, col].twiny()
+    axes_top.set_xlim(axes[0, col].get_xlim())
+    axes_top.set_xticks([8.75])
+    axes_top.set_xticklabels(['$\\beta_{max}$'], fontsize=10,ha='center',
+                    va='bottom', rotation = 45)
+    axes[1, col].set_xlabel("$\\beta \ (R_{H,m})$", fontsize=lbl_fs)
 
-            semi[cnt,1] = moon2_semi/R_H
-            ecc[cnt,1] = moon2_ecc
-            p2[cnt] = P2
+    if col == 1: #and col == 2 and r == 2:
+        axins = axes[1, col].inset_axes([0.11, 0.2, 0.35, 0.35]) #left bottom width heght
+        for j in range(1, 3):
+            e = data[:, j]
+            axins.scatter(delta_H, e,
+                s=2,color=colors[j-1],label=labels[j-1])
+        # axins[1, col].scatter(delta_H, time, s=1, color='r', alpha=0.7)
+        axins.set_yscale('log')   # zoomed semimajor-axis range
+        axins.set_xlim(7, 7.6)          # zoomed time range
+        axins.set_ylim(1e-1, 1.8e-1 ) 
+        mark_inset(axes[1, col], axins,loc1=2, loc2=4,
+                    fc="none", ec="k", lw=1)
+        # axins.tick_params(labelsize=8)
+        axins.yaxis.set_major_locator(FixedLocator([1e-1]))
+        axins.set_yticklabels(["$10^{-1}$"])
+        axins.yaxis.set_minor_locator(FixedLocator([1.1e-1, 1.2e-1, 1.3e-1, 1.4e-1,
+                                                    1.5e-1, 1.6e-1, 1.7e-1, 1.8e-1]))
+        axins.yaxis.set_minor_formatter(NullFormatter())
+        axins.tick_params(axis='y', which='major', length=5, width=1.2, labelsize=7)
+        axins.tick_params(axis='y', which='minor', length=2.5, width=0.8)
+        axins.tick_params(axis='x', which='both', labelsize=7)
 
-            semi[cnt,2] = moon3_semi/R_H
-            ecc[cnt,2] = moon3_ecc
-            p3[cnt] = P3
+#Color Bar
+cmap = mpl.colors.ListedColormap(colors)
 
-            semi[cnt,3] = moon4_semi/R_H
-            ecc[cnt,3] = moon4_ecc
-            p4[cnt] = P4
-        if moon_name == "C":
-            moon1_semi, moon1_ecc, moon1_d, P1 = Cart2Orb(ps[1], ps[2], earth_mass + M_moon)
-            moon2_semi, moon2_ecc, moon2_d, P2 = Cart2Orb(ps[1], ps[3], earth_mass + M_moon)
-            moon3_semi, moon3_ecc, moon3_d, P3 = Cart2Orb(ps[1], ps[4], earth_mass + M_moon)
-            moon4_semi, moon4_ecc, moon4_d, P4 = Cart2Orb(ps[1], ps[5], earth_mass + M_moon)
-            moon5_semi, moon5_ecc, moon5_d, P5 = Cart2Orb(ps[1], ps[6], earth_mass + M_moon)
+bounds = np.arange(len(colors) + 1)
+norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
-            ecc[cnt,0] = moon1_ecc
-            semi[cnt,0] = moon1_semi/R_H
-            p1[cnt] = P1
+cax = fig.add_axes([0.125, 0.92, 0.08, 0.03])
 
-            semi[cnt,1] = moon2_semi/R_H
-            ecc[cnt,1] = moon2_ecc
-            p2[cnt] = P2
+cb = fig.colorbar(mpl.cm.ScalarMappable(cmap=cmap, norm=norm),
+                  cax=cax, orientation='horizontal', drawedges=True)
 
-            semi[cnt,2] = moon3_semi/R_H
-            ecc[cnt,2] = moon3_ecc
-            p3[cnt] = P3
+cax.xaxis.set_ticks_position('top')
+cb.set_ticks(bounds[:-1] + 0.5)
+cb.set_ticklabels([str(i+1) for i in range(len(colors))], fontsize=12)
+cax.tick_params(axis='x', length=0)
 
-            semi[cnt,3] = moon4_semi/R_H
-            ecc[cnt,3] = moon4_ecc
-            p4[cnt] = P4
+cax.text(1.02, 0.5, "Moon Index $i$", transform=cax.transAxes,
+         va='center', ha='left', fontsize=14)
 
-            semi[cnt,4] = moon5_semi/R_H
-            ecc[cnt,4] = moon5_ecc
-            p5[cnt] = P5
-
-        t[cnt] = sa[j].t
-        cnt +=1
-
-    color = ['r','b','g','purple','orange']
-    s = .5
-    ylabels = ['$a\\ (R_H)$','$e$','$p_{i+1}/p_i$']
-    ylims = [(1e-2,0.45),(1e-5, 1),(1,70)]
-    sublb = ['e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm']
-    for m in range(nmoon): #moon number
-        for r in range(3):
-            axes[r,col].minorticks_on()
-            axes[r,col].text(0.03, 0.88, sublb[r * len(tau) + col], color='k', fontsize='large', weight='bold',horizontalalignment='left', transform=axes[r,col].transAxes)
-            axes[r,col].tick_params(which='major',axis='both', direction='out',length = 6.0, width = 4.0)
-            axes[r,col].tick_params(which='minor',axis='both', direction='out',length = 3.0, width = 2.0)
-            axes[r,col].set_ylim(ylims[r])
-            axes[r,col].set_xlim(0,25)
-            if r == 0:
-                axes[0,col].scatter(t, semi[:, m],marker='o',color=color[m],s = s,alpha=0.5)
-            elif r == 1:
-                axes[1,col].scatter(t, ecc[:, m], marker='o', color=color[m], s = s, alpha=0.4)
-                axes[1,col].set_yscale('log')
-                locmaj = LogLocator(base=10.0, numticks=100)
-                axes[1,col].yaxis.set_major_locator(locmaj)
-                # 2. Define the minor ticks (2, 3, 4...9 for each decade)
-                # subs=np.arange(2, 10) creates ticks at 0.2, 0.3... and 2, 3...
-                locmin = LogLocator(base=10.0, subs=np.arange(2, 10) * .1, numticks=100)
-                axes[1,col].yaxis.set_minor_locator(locmin)
-                axes[1,col].yaxis.set_minor_formatter(NullFormatter())
-            elif r == 2:
-                if m ==1:
-                    axes[2, col].scatter(t, p2/p1 ,marker='o',color='b',s = s,alpha=0.5)
-                elif m ==2:
-                    axes[2,col].scatter(t, p3/p2 ,marker='o',color='g',s = s,alpha=0.5)
-                elif m ==3:
-                    axes[2,col].scatter(t, p4/p3 ,marker='o',color='purple',s = s,alpha=0.5)
-                elif m ==4:
-                    axes[2,col].scatter(t, p5/p4, marker='o', color='orange', s = s, alpha=0.5)
-                axes[2,col].set_xlabel('Time (yr)', fontsize=fs)
-            if col == 0:
-                axes[r,col].set_ylabel(ylabels[r], fontsize=fs)
-
-fig.subplots_adjust(wspace=0.3)
-filename = "Luna_sa_698.png"
-plt.savefig(filename, dpi=300)
+fig.subplots_adjust(wspace=0.1, hspace=0.15)#, right=0.90, top=0.86)
+plt.savefig("logt_ecc_Luna", dpi=300, bbox_inches="tight", pad_inches=0.05)
 plt.show()

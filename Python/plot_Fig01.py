@@ -62,7 +62,7 @@ def plot_emax(ax, file, moon, idx):
     ax.pcolormesh(xi, yi, np.log10(Zi), cmap=cmap, vmin=vmin, vmax=vmax, shading='auto')
     #moon idx [0,1,2,3]
     if idx in [4, 5]:
-        ax.set_xlabel("$\\beta_H$", fontsize=lbl_fs)
+        ax.set_xlabel("$\\beta \ (R_{H,m})$", fontsize=lbl_fs)
     else:
         ax.set_xticklabels([])
     if idx == 0 or idx == 2 or idx == 4:
@@ -78,13 +78,13 @@ def plot_emax(ax, file, moon, idx):
     ax.set_xlim(3.5, 9.0)
     ax.set_ylim(0, 0.3)
     if idx == 5:
-        color_label = "$\log_{10}\\beta e$"
+        color_label = "$\log_{10}\Delta e$"
         cax = fig.add_axes([0.92, 0.11, 0.015, 0.77])
         cbar = plt.colorbar(cmmapable, cax=cax, orientation='vertical')
         cbar.set_label(color_label, fontsize=lbl_fs)
-        cbar.ax.tick_params(axis='both', direction='out', length=8.0, width=2.0, labelsize=fs)
+        cbar.ax.tick_params(axis='both', direction='out', length=8.0, width=4.0, labelsize=fs)
     top_ticks =[5.9678,5.3222,6.2119,5.6769,4.8769,4.2948,4.6070,3.9278,8.75]
-    top_ticks_lbl = ['8:1','6:1','9:1','7:1','5:1','4:1','9:2','7:2','$\\beta_H$ Max']
+    top_ticks_lbl = ['8:1','6:1','9:1','7:1','5:1','4:1','9:2','7:2','$\\beta_\max$']
     if idx in [0,1]:
         ax_top = ax.twiny()
         ax_top.set_xlim(3.5, 9.0)
@@ -93,7 +93,7 @@ def plot_emax(ax, file, moon, idx):
         ax_top.tick_params(which='major', axis='both', direction='out', length=12.0, width=4.0, labelsize=fs)
         ax_top.tick_params(which='minor', axis='both', direction='out', length=6.0, width=4.0)
     for label, x in zip(top_ticks_lbl, top_ticks):
-        ax.axvline(x=x, color='green', linestyle='--', linewidth=2)
+        ax.axvline(x=x, color='k', linestyle='--', linewidth=2)
         if idx in [0,1]:
             ax_top.set_xticklabels(top_ticks_lbl, fontsize=10,ha='center',
                     va='bottom', rotation = 45)
@@ -122,5 +122,5 @@ plot_emax(ax4, file_T1, moon=2, idx=3)
 plot_emax(ax5, file_T2, moon=1, idx=4)
 plot_emax(ax6, file_T2, moon=2, idx=5)
 
-fig.subplots_adjust(wspace=0.25, hspace=0.15, right=0.90)
+fig.subplots_adjust(wspace=0.1, hspace=0.15, right=0.90)
 fig.savefig("L-emax.png", bbox_inches='tight', dpi=300)

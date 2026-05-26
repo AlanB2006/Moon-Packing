@@ -1,0 +1,208 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "source": [
+        "<a id=\"title_ID\"></a>\n",
+        "\n",
+        "# Multi-Moon System Setup\n",
+        "--------------------------------------------------------------\n",
+        "\n",
+        "**Author**: Alan Briseno (abriseno1@leomail.tamuc.edu)  \n",
+        "**Latest update**: Jan 28, 2026.\n",
+        "\n",
+        "---\n",
+        "\n",
+        "<div class=\"alert alert-block alert-warning\">\n",
+        "    <h3><u><b>Notebook Goals</b></u></h3>\n",
+        "    <ul>\n",
+        "        <li>Learn what software and libraries are required</li>\n",
+        "        <li>Learn how to set up a similar system</li>\n",
+        "        <li>Learn how to interpret information and plot data</li>\n",
+        "    </ul>\n",
+        "</div>\n",
+        "\n",
+        "## 📦 1. Required Software, Libraries, and Versions\n",
+        "\n",
+        "<div class=\"alert alert-block alert-info\">\n",
+        "\n",
+        "This notebook relies on the REBOUND N-body integrator and its extension library software\n",
+        "REBOUNDx, along with standard scientific Python libraries.\n",
+        "Note: All simulations and data are processed through Google Colab.\n",
+        "\n",
+        "</div>\n",
+        "\n",
+        "### Simulation Libraries\n",
+        "- **REBOUND** ≥ 4.5.0  \n",
+        "  High-precision N-body integrator used for orbital dynamics simulations.\n",
+        "\n",
+        "- **REBOUNDx** ≥ 4.6.0  \n",
+        "  Extension package for REBOUND that enables additional physics such as tidal forces,\n",
+        "  spin evolution, and dissipative effects.\n",
+        "\n",
+        "### Scientific Stack\n",
+        "- **Python** ≥ 3.10  \n",
+        "- **NumPy** — numerical arrays and fast vectorized operations  \n",
+        "- **SciPy** — physical constants and scientific utilities  \n",
+        "- **Matplotlib** — data visualization and plotting  \n",
+        "\n",
+        "### Utilities\n",
+        "- **multiprocessing** — parallel execution of simulations  \n",
+        "- **threading** — lightweight concurrency  \n",
+        "- **time / os / sys** — system interaction and timing utilities  \n",
+        "\n",
+        "---\n",
+        "\n",
+        "### Installation Notes\n",
+        "In **Google Colab**, most scientific libraries are pre-installed.  \n",
+        "However, **REBOUND** and **REBOUNDx** must be installed manually using `pip`.\n",
+        "\n",
+        "The versions used in this notebook were:\n",
+        "- `rebound==4.5.0`\n",
+        "- `reboundx==4.6.0`\n"
+      ],
+      "metadata": {
+        "id": "intro_md"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install reboundx==4.6.0\n",
+        "!pip install rebound==4.5.0\n",
+        "\n",
+        "import rebound\n",
+        "import reboundx\n",
+        "import numpy as np\n",
+        "import sys\n",
+        "import os\n",
+        "import time\n",
+        "import threading\n",
+        "import multiprocessing as mp\n",
+        "import matplotlib.pyplot as plt\n",
+        "from scipy.constants import astronomical_unit\n"
+      ],
+      "metadata": {
+        "id": "imports_code"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "---\n",
+        "## ⌬ 2. Example: Tidal Evolution of a Multi-Moon System\n",
+        "\n",
+        "In this example, we will simulate a central host (like a gas giant) and two moons near a 2:1 mean-motion resonance. We will use `REBOUNDx` to apply a simple tidal force (constant time lag) to the central body to demonstrate how energy dissipation affects the inner moon's orbit over time. Finally, we will extract and plot the semi-major axis and eccentricity evolution.\n"
+      ],
+      "metadata": {
+        "id": "example_md"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# ---------------------------------------------------------\n",
+        "# 1. Initialize Simulation\n",
+        "# ---------------------------------------------------------\n",
+        "sim = rebound.Simulation()\n",
+        "sim.units = ('yr', 'AU', 'Msun')\n",
+        "\n",
+        "# Add a central host (e.g., a Jupiter-mass planet)\n",
+        "sim.add(m=1e-3, r=0.0005, hash=\"Host\")\n",
+        "\n",
+        "# Add an inner moon and an outer moon near a 2:1 resonance\n",
+        "sim.add(m=1e-7, r=1e-5, a=0.01, e=0.05, hash=\"Moon1\")\n",
+        "sim.add(m=1e-7, r=1e-5, a=0.01587, e=0.01, hash=\"Moon2\")\n",
+        "\n",
+        "sim.move_to_com() # Move to center of momentum frame\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 2. Add REBOUNDx Tidal Forces\n",
+        "# ---------------------------------------------------------\n",
+        "rebx = reboundx.Extras(sim)\n",
+        "tides = rebx.load_force(\"tides_constant_time_lag\")\n",
+        "rebx.add_force(tides)\n",
+        "\n",
+        "# Set the tidal parameters for the Host body\n",
+        "# (Using exaggerated values here just so the effect is visible quickly in a short sim)\n",
+        "sim.particles[\"Host\"].params[\"tctl_k2\"] = 0.3\n",
+        "sim.particles[\"Host\"].params[\"tctl_tau\"] = 1e-2 \n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 3. Integration & Data Collection\n",
+        "# ---------------------------------------------------------\n",
+        "N_outputs = 500\n",
+        "times = np.linspace(0, 100, N_outputs)\n",
+        "\n",
+        "# Arrays to store orbital elements\n",
+        "a1, e1 = np.zeros(N_outputs), np.zeros(N_outputs)\n",
+        "a2, e2 = np.zeros(N_outputs), np.zeros(N_outputs)\n",
+        "\n",
+        "for i, t in enumerate(times):\n",
+        "    sim.integrate(t)\n",
+        "    a1[i] = sim.particles[\"Moon1\"].a\n",
+        "    e1[i] = sim.particles[\"Moon1\"].e\n",
+        "    a2[i] = sim.particles[\"Moon2\"].a\n",
+        "    e2[i] = sim.particles[\"Moon2\"].e\n",
+        "\n",
+        "# ---------------------------------------------------------\n",
+        "# 4. Plotting the Orbital Evolution\n",
+        "# ---------------------------------------------------------\n",
+        "fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)\n",
+        "plt.subplots_adjust(hspace=0.1)\n",
+        "\n",
+        "# Semi-major axis plot\n",
+        "ax1.plot(times, a1, label=\"Moon 1\", color='b')\n",
+        "ax1.plot(times, a2, label=\"Moon 2\", color='r')\n",
+        "ax1.set_ylabel(\"Semi-major Axis (AU)\", fontsize=12)\n",
+        "ax1.set_title(\"Orbital Evolution Under Tidal Dissipation\", fontsize=14)\n",
+        "ax1.legend(loc=\"upper right\")\n",
+        "ax1.grid(True, linestyle='--', alpha=0.6)\n",
+        "\n",
+        "# Eccentricity plot\n",
+        "ax2.plot(times, e1, label=\"Moon 1 (e)\", color='b')\n",
+        "ax2.plot(times, e2, label=\"Moon 2 (e)\", color='r')\n",
+        "ax2.set_ylabel(\"Eccentricity\", fontsize=12)\n",
+        "ax2.set_xlabel(\"Time (Years)\", fontsize=12)\n",
+        "ax2.grid(True, linestyle='--', alpha=0.6)\n",
+        "\n",
+        "plt.show()\n"
+      ],
+      "metadata": {
+        "id": "sim_code"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### 📊 Understanding the Output\n",
+        "\n",
+        "* **Semi-Major Axis (a):** You will notice the inner moon's semi-major axis slowly decaying due to the exaggerated tidal forces applied via `REBOUNDx`. The outer moon remains relatively stable.\n",
+        "* **Eccentricity (e):** The eccentricities exhibit periodic oscillations. When moons are near or captured into a Mean-Motion Resonance (MMR), these oscillations become highly coupled.\n",
+        "\n",
+        "**Note on Performance:** When running large-scale tidal evolution over millions of orbits, Python's `multiprocessing` library is recommended to batch multiple initial conditions across different CPU cores.\n"
+      ],
+      "metadata": {
+        "id": "output_md"
+      }
+    }
+  ]
+}

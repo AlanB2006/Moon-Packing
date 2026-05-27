@@ -144,7 +144,7 @@ def calc_Tide_evolution(M_sat,a_p,e_p,M_p,M_star,R_p,k2p,alpha,t_fin):
     out_stg = "%1.5e,%1.4f,%1.4f,%1.4f,%1.4f,%1.6e\n" % (0,a_m/R_H,e_m,a_p,e_p,O_p)
     write2file(fname,out_stg,'foot')
 
-    tau_p = 100./3600./24./365.25  #Hut-->550; Barnes-->600 ; Reboundx -->300
+    tau_p = 698./3600./24./365.25  #Hut-->550; Barnes-->600 ; Reboundx -->300
     moon_escape = False
     for i in range(1,nsteps):
         t_i = times[i-1]

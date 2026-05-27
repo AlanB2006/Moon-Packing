@@ -54,7 +54,7 @@ for col, i in enumerate(tau):
     ax = axes[col]
 
     sa = rebound.Simulationarchive(
-        "/content/drive/MyDrive/Case-Study/Ceres/Simulation Archive/Tau_698/C_%i.bin" % i
+        "/content/C_%i.bin" % i
     )
 
     m1x, m1y = [], []
@@ -148,7 +148,7 @@ axes = axes_bottom
 
 for col, i in enumerate(tau):
     sa = rebound.Simulationarchive(
-        "/content/drive/MyDrive/Case-Study/Ceres/Simulation Archive/Tau_698/C_%i.bin" % i)
+        "/content/C_%i.bin" % i)
 
     npts = int(len(sa) / 10) + 1
     semi = np.zeros((npts, nmoon))
@@ -261,7 +261,7 @@ for col, i in enumerate(tau):
             #         axesins.scatter(t, semi[:, mm], marker='o', color=color[mm], s=s, alpha=0.5)
 
             #     axesins.set_xlim(0, 10)          # zoomed time range
-            #     axesins.set_ylim(0.0, 0.1)    # zoomed semimajor-axis range
+            #     axesins.set_ylim(0.0, 0.1)    # zoomed semimajoraxis range
             #     axesins.tick_params(labelsize=7)
 
             elif r == 1:

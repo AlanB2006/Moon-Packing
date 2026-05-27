@@ -126,7 +126,7 @@ def deriv_t_Barnes(t,y,k2p,tau_p,M_p,R_p,M_m,M_star,alpha):
 def calc_Tide_evolution(M_sat,a_p,e_p,M_p,M_star,R_p,k2p,alpha,t_fin):
     #t_fin = tscale
     #times = np.concatenate((np.arange(0,1000,100),np.arange(1000,t_fin+1000,1000)))
-    times = np.arange(0,3e4,100)
+    times = np.arange(0,3e4,100)#3e4
     nsteps = len(times)
 
     R_H = a_p*((M_p+M_sat)/(3.*M_star))**(1./3.)
@@ -180,4 +180,4 @@ fname = "sec_tide.txt"
 lock = threading.Lock()
 M_A = 1.
 write2file(fname,"",'head')
-calc_Tide_evolution(M_Moon,1,0.0167,M_E,M_A,R_E,0.299,0.3308,3e4)
+calc_Tide_evolution(M_Moon,1,0.0167,M_E,M_A,R_E,0.299,0.3308,3e4)#3e4

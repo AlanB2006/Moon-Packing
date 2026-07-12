@@ -1,7 +1,7 @@
 # Moon Packing
 
 [![Tests](https://github.com/AlanB2006/Moon-Packing/actions/workflows/tests.yml/badge.svg)](https://github.com/AlanB2006/Moon-Packing/actions/workflows/tests.yml)
-[![DOI](https://zenodo.org/badge/1081521581.svg)](https://doi.org/10.5281/zenodo.20408204)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1081521581.svg)](https://doi.org/10.5281/zenodo.20408204)
 
 Reproducibility repository for **“Tidal evolution of packed moon systems around an Earth-mass planet”** by Alan Briseno, Billy Quarles, and Marialis Rosario-Franco, forthcoming in *The Astrophysical Journal*.
 

@@ -2,22 +2,22 @@
   "title": "Moon Packing: data and software for tidal evolution of packed moon systems",
   "description": "Reproducibility package for N-body and tidal simulations of packed Luna-, Pluto-, and Ceres-mass moon systems around an Earth-mass planet.",
   "upload_type": "software",
-  "version": "1.0.0",
+  "version": "1.1",
   "access_right": "open",
   "license": "mit",
   "language": "eng",
   "creators": [
     {
-      "name": "Briseno, Alan"
-	  "orcid": "0009-0005-1722-1971"
+      "name": "Briseno, Alan",
+      "orcid": "0009-0005-1722-1971"
     },
     {
       "name": "Quarles, Billy",
       "orcid": "0000-0003-2435-5990"
     },
     {
-      "name": "Rosario-Franco, Marialis"
-	  "orcid": "0000-0003-0216-559X"
+      "name": "Rosario-Franco, Marialis",
+      "orcid": "0000-0003-0216-559X"
     }
   ],
   "keywords": [

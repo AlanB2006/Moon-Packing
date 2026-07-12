@@ -4,13 +4,13 @@
 
 The repository encodes the revised manuscript setup:
 
-- Sun mass: \(1\,M_\odot\).
-- Planet mass: \(3.003\times10^{-6}\,M_\odot\), semimajor axis 1 au, eccentricity 0.01671022.
-- Planet radius 6371 km, density 5.515 g cm\(^{-3}\), normalized moment of inertia 0.3308, Love number 0.298, obliquity 23.44°, initial spin period 6 hr.
+- Sun mass: $1\,M_\odot$.
+- Planet mass: $3.003\times10^{-6}\,M_\odot$, semimajor axis 1 au, eccentricity 0.01671022.
+- Planet radius 6371 km, density 5.515 g cm$^{-3}$, normalized moment of inertia 0.3308, Love number 0.298, obliquity 23.44°, initial spin period 6 hr.
 - Inner moon begins at twice the fluid Roche radius.
 - Initial phases follow the golden-ratio prescription.
 - REBOUND IAS15, with the initial timestep based on 5% of the period at 1.8 Roche radii.
-- REBOUNDx `tides_spin` constant-time-lag model with \(\tau=0,100,698\) s.
+- REBOUNDx `tides_spin` constant-time-lag model with $\tau=0,100,698$ s.
 
 ## REBOUND SimulationArchive inputs for legacy `Fig02.py`
 
@@ -25,9 +25,9 @@ The SimulationArchive files are too big to host on GitHub and are therefore host
 
 ## Production durations
 
-- Lifetime sweeps: \(10^7 P_1\).
-- Eccentricity maps: \(10^5 P_1\).
-- Time-series examples: 25 yr with output every 5 \(P_1\).
+- Lifetime sweeps: $10^7 P_1$.
+- Eccentricity maps: $10^5 P_1$.
+- Time-series examples: 25 yr with output every 5 $P_1$.
 
 The complete production grids are expensive. Run the laptop examples first and estimate resource use from `wall_time` before submitting a cluster campaign.
 

@@ -4,7 +4,7 @@ All published tables are comma-separated text files with a commented header.
 
 | Column | Meaning |
 |---|---|
-| `dH` | Initial mutual-Hill spacing parameter, \(\beta\) |
+| `dH` | Initial mutual-Hill spacing parameter, $\beta$ |
 | `e0` | Initial eccentricity of every moon |
 | `eMi_max` | Maximum eccentricity recorded for moon `i` |
 | `eMi_min` | Minimum eccentricity recorded for moon `i` |
@@ -24,6 +24,6 @@ Observed fate labels include:
 
 ## Directory split
 
-- `data/sweeps/`: \(e_0\approx0\) integrations to \(10^7 P_1\), used for Figures 2–4.
-- `data/eccentricity_maps/`: \((\beta,e_0)\) grids to \(10^5 P_1\), used for Figures 8–10.
+- `data/sweeps/`: $e_0\approx0$ integrations to $10^7 P_1$, used for Figures 2–4.
+- `data/eccentricity_maps/`: $(\beta,e_0)$ grids to $10^5 P_1$, used for Figures 8–10.
 - `data/generated/`: outputs created by new runs. These are ignored by Git unless explicitly added.

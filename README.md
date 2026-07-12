@@ -42,7 +42,7 @@ Moon-Packing/
 
 ## Installation
 
-Python 3.10–3.12 is recommended. The exact software versions reported in the manuscript are REBOUND 4.4.6 and REBOUNDx 4.4.1.
+Python 3.10–3.12 is recommended. The exact software versions reported in the manuscript are REBOUND 4.4.6 and REBOUNDx 4.4.1. 
 
 ### Conda
 

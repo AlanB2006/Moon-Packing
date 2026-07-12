@@ -153,12 +153,6 @@ moon-packing-run-grid \
 
 For a scheduler-friendly pattern, see [`examples/slurm_array.sh`](examples/slurm_array.sh). Production values and the mapping to manuscript methods are documented in [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
 
-## Important reproducibility note
-
-The archived simulation script stops when a moon’s **semimajor axis** exceeds `0.4 R_H`; the revised manuscript describes the criterion in terms of **apocenter**. The command-line code defaults to `--outer-boundary semimajor-axis` so that reruns match the archived tables. Use `--outer-boundary apocenter` to implement the wording in the revised manuscript. This choice should be resolved before the final Zenodo release.
-
-The package also retains the exact semimajor-axis placement expression used by the archived scripts (`--spacing-mode archived`). A recursive implementation of the equation as written in the manuscript is available with `--spacing-mode recursive` for sensitivity checks.
-
 ## Tests
 
 ```bash

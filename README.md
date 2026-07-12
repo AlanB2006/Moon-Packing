@@ -1,7 +1,7 @@
 # Moon Packing
 
 [![Tests](https://github.com/AlanB2006/Moon-Packing/actions/workflows/tests.yml/badge.svg)](https://github.com/AlanB2006/Moon-Packing/actions/workflows/tests.yml)
-![Zenodo DOI forthcoming](https://img.shields.io/badge/Zenodo-DOI%20forthcoming-blue)
+[![DOI](https://zenodo.org/badge/1081521581.svg)](https://doi.org/10.5281/zenodo.20408204)
 
 Reproducibility repository for **“Tidal evolution of packed moon systems around an Earth-mass planet”** by Alan Briseno, Billy Quarles, and Marialis Rosario-Franco, forthcoming in *The Astrophysical Journal*.
 
@@ -24,7 +24,7 @@ Moon-Packing/
 ├── data/
 │   ├── sweeps/                 # Published beta sweeps (Figures 2–4)
 │   ├── eccentricity_maps/      # Published beta/e0 grids (Figures 8–10)
-│   ├── Simulation_Archives/     # REBOUND binary archives used by legacy Fig02.py
+│   ├── Legacy/                 # original grid files
 │   └── generated/              # New simulation products (not tracked)
 ├── figures/
 │   ├── reference/              # Supplied manuscript-ready PDFs
@@ -90,9 +90,7 @@ See [`docs/FIGURE_MAP.md`](docs/FIGURE_MAP.md) for the required input file and c
 
 ### `Fig02.py` simulation archives
 
-The `Fig02.py` workflow also depends on REBOUND SimulationArchive binary files (`*.bin`). Those files are distinct from the comma-separated sweep and eccentricity-map tables described above. The archive files are required when running the `Fig02.py` workflow directly, but they are not required for the table-based `moon-packing-figures --figures 2 3 4 8 9 10` command.
-
-See [`data/Simulation_Archives/README.md`](data/Simulation_Archives/README.md) and [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) for details.
+The `Fig02.py` workflow also depends on REBOUND SimulationArchive binary files (`*.bin`) in a Zenodo repository. Those files are distinct from the comma-separated sweep and eccentricity-map tables described above. The archive files are required when running the `Fig02.py` workflow directly, but they are not required for the table-based `moon-packing-figures --figures 2 3 4 8 9 10` command.
 
 ## Run a small simulation example
 
@@ -152,12 +150,6 @@ moon-packing-run-grid \
 ```
 
 For a scheduler-friendly pattern, see [`examples/slurm_array.sh`](examples/slurm_array.sh). Production values and the mapping to manuscript methods are documented in [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
-
-## Important reproducibility note
-
-The archived simulation script stops when a moon’s **semimajor axis** exceeds `0.4 R_H`; the revised manuscript describes the criterion in terms of **apocenter**. The command-line code defaults to `--outer-boundary semimajor-axis` so that reruns match the archived tables. Use `--outer-boundary apocenter` to implement the wording in the revised manuscript. This choice should be resolved before the final Zenodo release.
-
-The package also retains the exact semimajor-axis placement expression used by the archived scripts (`--spacing-mode archived`). A recursive implementation of the equation as written in the manuscript is available with `--spacing-mode recursive` for sensitivity checks.
 
 ## Tests
 

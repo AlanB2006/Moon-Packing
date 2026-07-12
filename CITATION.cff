@@ -5,11 +5,13 @@ type: software
 authors:
   - family-names: Briseno
     given-names: Alan
+	orcid: "https://orcid.org/0009-0005-1722-1971"
   - family-names: Quarles
     given-names: Billy
     orcid: "https://orcid.org/0000-0003-2435-5990"
   - family-names: Rosario-Franco
     given-names: Marialis
+	orcid: "https://orcid.org/0000-0003-0216-559X"
 version: 1.0.0
 date-released: 2026-07-11
 repository-code: "https://github.com/AlanB2006/Moon-Packing"
@@ -27,10 +29,13 @@ preferred-citation:
   authors:
     - family-names: Briseno
       given-names: Alan
+	  orcid: "https://orcid.org/0009-0005-1722-1971"
     - family-names: Quarles
       given-names: Billy
+	  orcid: "https://orcid.org/0000-0003-2435-5990"
     - family-names: Rosario-Franco
       given-names: Marialis
+	  orcid: "https://orcid.org/0000-0003-0216-559X"
   journal: "The Astrophysical Journal"
   year: 2026
   notes: "Forthcoming. Add volume, issue, pages/article number, DOI, and ADS bibcode after publication."

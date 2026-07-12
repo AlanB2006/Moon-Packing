@@ -171,7 +171,7 @@ sha256sum --check checksums.sha256
 
 Until the ApJ article and Zenodo record receive final bibliographic information, cite the manuscript and software repository as:
 
-> Briseno, A., Quarles, B., & Rosario-Franco, M. (2026). *Tidal evolution of packed moon systems around an Earth-mass planet*. The Astrophysical Journal, forthcoming. Software and data: Moon Packing, Zenodo DOI forthcoming.
+> Briseno, A., Quarles, B., & Rosario-Franco, M. (2026). *Tidal evolution of packed moon systems around an Earth-mass planet*. The Astrophysical Journal, forthcoming. Software and data: Moon Packing, Zenodo DOI 10.5281/zenodo.20408204.
 
 BibTeX placeholder:
 
@@ -181,7 +181,7 @@ BibTeX placeholder:
   title   = {Tidal evolution of packed moon systems around an Earth-mass planet},
   journal = {The Astrophysical Journal},
   year    = {2026},
-  note    = {Forthcoming; Zenodo DOI to be added}
+  note    = {Forthcoming; Zenodo DOI 10.5281/zenodo.20408204}
 }
 ```
 

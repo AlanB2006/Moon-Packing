@@ -14,6 +14,7 @@ from scipy.interpolate import griddata
 from .constants import get_moon_model
 from .dynamics import beta_max, resonance_beta
 from .io import read_results
+from .legacy_map_style import LEGACY_UNSTABLE_FATES, LUNA_FIG02_STYLE
 
 TAUS = [0, 100, 698]
 MOON_COLORS = ["red", "blue", "saddlebrown", "purple", "orange"]
@@ -108,6 +109,89 @@ def plot_lifetime_eccentricity(moon_type: str, root: str | Path | None = None, o
     return _save(fig, output)
 
 
+def _legacy_heat_grid(table, moon_index: int):
+    beta = table["dH"]
+    e0 = table["e0"]
+    values = table.eccentricity_range(moon_index).copy()
+    unstable = np.isin(table.fate, LEGACY_UNSTABLE_FATES)
+    values[unstable] = 1.5
+    xi = np.arange(LUNA_FIG02_STYLE.x_limits[0], LUNA_FIG02_STYLE.x_grid_stop, 0.01)
+    yi = np.arange(LUNA_FIG02_STYLE.y_limits[0], LUNA_FIG02_STYLE.y_grid_stop, 0.01)
+    xg, yg = np.meshgrid(xi, yi)
+    zi = griddata((beta, e0), values, (xg, yg), method="nearest")
+    zi = np.ma.masked_invalid(zi)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        log_delta_e = np.log10(zi)
+    return xi, yi, log_delta_e
+
+
+def _add_legacy_fig02_top_axis(ax):
+    style = LUNA_FIG02_STYLE
+    top_ax = ax.twiny()
+    top_ax.set_xlim(*style.x_limits)
+    top_ax.set_xticks(style.top_ticks)
+    top_ax.set_xticklabels([])
+    top_ax.tick_params(which="major", axis="both", direction="out", length=style.major_tick_length, width=style.major_tick_width, labelsize=style.tick_label_size)
+    top_ax.tick_params(which="minor", axis="both", direction="out", length=style.minor_tick_length, width=style.top_minor_tick_width)
+    top_ax.set_xticklabels(style.top_tick_labels, fontsize=style.top_tick_label_size, ha="center", va="bottom", rotation=45)
+    return top_ax
+
+
+def _style_legacy_fig02_axis(ax, index: int):
+    style = LUNA_FIG02_STYLE
+    if index in (4, 5):
+        ax.set_xlabel(r"$\beta \ (R_{H,m})$", fontsize=style.label_font_size)
+    else:
+        ax.set_xticklabels([])
+    if index in (0, 2, 4):
+        ax.set_ylabel(r"$e_0$", fontsize=style.label_font_size)
+    else:
+        ax.set_yticklabels([])
+    ax.minorticks_on()
+    ax.tick_params(which="major", axis="both", direction="out", length=style.major_tick_length, width=style.major_tick_width, labelsize=style.tick_label_size)
+    ax.tick_params(which="minor", axis="both", direction="out", length=style.minor_tick_length, width=style.minor_tick_width)
+    ax.text(0.025, 0.92, style.panel_labels[index], color="k", fontsize="xx-large", weight="bold", horizontalalignment="left", transform=ax.transAxes)
+    ax.set_xlim(*style.x_limits)
+    ax.set_ylim(*style.y_limits)
+    if index in (0, 1):
+        _add_legacy_fig02_top_axis(ax)
+    for location in style.top_ticks:
+        ax.axvline(x=location, color="k", linestyle="--", linewidth=style.resonance_line_width)
+
+
+def _save_legacy_figure(fig, output: Path) -> Path:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output, bbox_inches="tight", dpi=LUNA_FIG02_STYLE.figure_dpi)
+    plt.close(fig)
+    return output
+
+
+def _plot_luna_legacy_fig02(root: Path, output: Path) -> Path:
+    style = LUNA_FIG02_STYLE
+    fig = plt.figure(figsize=style.figure_size, dpi=style.figure_dpi)
+    axes = [fig.add_subplot(321), fig.add_subplot(322), fig.add_subplot(323), fig.add_subplot(324), fig.add_subplot(325), fig.add_subplot(326)]
+    image = None
+
+    for row, tau in enumerate(TAUS):
+        table = read_results(_map_path(root, "Luna", tau))
+        moon_indices = (1, 2)
+        for col, moon_index in enumerate(moon_indices):
+            index = row * 2 + col
+            ax = axes[index]
+            xi, yi, log_delta_e = _legacy_heat_grid(table, moon_index)
+            image = ax.pcolormesh(xi, yi, log_delta_e, cmap=plt.cm.gnuplot, vmin=-2, vmax=0, shading="auto")
+            _style_legacy_fig02_axis(ax, index)
+
+    if image is not None:
+        colorbar_axis = fig.add_axes(style.colorbar_position)
+        colorbar = fig.colorbar(image, cax=colorbar_axis, orientation="vertical")
+        colorbar.set_label(r"$\log_{10}\Delta e$", fontsize=style.label_font_size)
+        colorbar.ax.tick_params(axis="both", direction="out", length=style.colorbar_tick_length, width=style.major_tick_width, labelsize=style.tick_label_size)
+
+    fig.subplots_adjust(wspace=style.subplot_wspace, hspace=style.subplot_hspace, right=style.subplot_right)
+    return _save_legacy_figure(fig, output)
+
+
 def _heat_grid(table, moon_index: int, xmax: float):
     beta = table["dH"]
     e0 = table["e0"]
@@ -122,9 +206,7 @@ def _heat_grid(table, moon_index: int, xmax: float):
     return xi, yi, np.log10(zi)
 
 
-def plot_eccentricity_map(moon_type: str, root: str | Path | None = None, output: str | Path | None = None) -> Path:
-    root = Path(root) if root else _repo_root()
-    model = get_moon_model(moon_type)
+def _plot_generic_eccentricity_map(model, root: Path, output: Path) -> Path:
     cfg = PAPER_CONFIG[model.name]
     fig, axes = plt.subplots(3, 2, figsize=(10.5, 11.5), sharex=True, sharey=True)
     image = None
@@ -165,14 +247,22 @@ def plot_eccentricity_map(moon_type: str, root: str | Path | None = None, output
         axes[row, 1].text(0.97, 0.92, rf"$\tau={tau}\,$s", transform=axes[row, 1].transAxes, ha="right", va="top", fontsize=10, bbox={"facecolor": "white", "alpha": 0.75, "edgecolor": "none", "pad": 1.5})
 
     if image is not None:
-        cbar = fig.colorbar(image, ax=axes.ravel().tolist(), pad=0.02, fraction=0.035)
-        cbar.set_label(r"$\log_{10}\Delta e$")
+        colorbar = fig.colorbar(image, ax=axes.ravel().tolist(), pad=0.02, fraction=0.035)
+        colorbar.set_label(r"$\log_{10}\Delta e$")
 
     fig.subplots_adjust(wspace=0.08, hspace=0.08, right=0.88, top=0.86)
-    fig_no = {"Luna": 8, "Pluto": 9, "Ceres": 10}[model.name]
-    output = Path(output) if output else root / "figures" / "reproduced" / f"figure{fig_no:02d}_{model.name.lower()}_eccentricity_map.pdf"
     return _save(fig, output)
 
+
+def plot_eccentricity_map(moon_type: str, root: str | Path | None = None, output: str | Path | None = None) -> Path:
+    root = Path(root) if root else _repo_root()
+    model = get_moon_model(moon_type)
+    fig_no = {"Luna": 8, "Pluto": 9, "Ceres": 10}[model.name]
+    default_suffix = ".png" if model.name == "Luna" else ".pdf"
+    output = Path(output) if output else root / "figures" / "reproduced" / f"figure{fig_no:02d}_{model.name.lower()}_eccentricity_map{default_suffix}"
+    if model.name == "Luna":
+        return _plot_luna_legacy_fig02(root, output)
+    return _plot_generic_eccentricity_map(model, root, output)
 
 def plot_tides_validation(root: str | Path | None = None, output: str | Path | None = None) -> Path:
     root = Path(root) if root else _repo_root()
@@ -271,7 +361,8 @@ def reproduce_figures(figures: list[int], root: str | Path | None = None, output
                 outputs.append(plot_time_series(name, betas, root, output_dir / f"figure{figure:02d}_{name.lower()}_timeseries.pdf"))
             elif figure in {8, 9, 10}:
                 name = {8: "Luna", 9: "Pluto", 10: "Ceres"}[figure]
-                outputs.append(plot_eccentricity_map(name, root, output_dir / f"figure{figure:02d}_{name.lower()}_eccentricity_map.pdf"))
+                suffix = ".png" if name == "Luna" else ".pdf"
+                outputs.append(plot_eccentricity_map(name, root, output_dir / f"figure{figure:02d}_{name.lower()}_eccentricity_map{suffix}"))
             else:
                 warnings.warn(f"No recipe is defined for figure {figure}")
         except FileNotFoundError as exc:

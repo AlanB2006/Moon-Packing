@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moon-packing"
+version = "1.0.0"
+description = "Reproducibility software and data for tidal evolution of packed moon systems"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+license = {text = "MIT"}
+authors = [
+  {name = "Alan Briseno"},
+  {name = "Billy Quarles"},
+  {name = "Marialis Rosario-Franco"},
+]
+dependencies = [
+  "numpy>=1.26,<3",
+  "scipy>=1.11,<2",
+  "matplotlib>=3.8,<3.11",
+]
+
+[project.optional-dependencies]
+simulation = [
+  "rebound==4.4.6",
+  "reboundx==4.4.1",
+]
+test = [
+  "pytest>=8,<9",
+]
+
+[project.urls]
+Homepage = "https://github.com/AlanB2006/Moon-Packing"
+Repository = "https://github.com/AlanB2006/Moon-Packing"
+Issues = "https://github.com/AlanB2006/Moon-Packing/issues"
+
+[project.scripts]
+moon-packing-run-grid = "moon_packing.cli:run_grid_main"
+moon-packing-run-timeseries = "moon_packing.cli:run_timeseries_main"
+moon-packing-figures = "moon_packing.cli:figures_main"
+moon-packing-validate-tides = "moon_packing.cli:validate_tides_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]

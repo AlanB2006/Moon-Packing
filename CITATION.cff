@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this software or data, please cite the ApJ paper and the archived software release."
+title: "Moon Packing: data and software for tidal evolution of packed moon systems"
+type: software
+authors:
+  - family-names: Briseno
+    given-names: Alan
+  - family-names: Quarles
+    given-names: Billy
+    orcid: "https://orcid.org/0000-0003-2435-5990"
+  - family-names: Rosario-Franco
+    given-names: Marialis
+version: 1.0.0
+date-released: 2026-07-11
+repository-code: "https://github.com/AlanB2006/Moon-Packing"
+license: MIT
+keywords:
+  - exomoons
+  - celestial mechanics
+  - tidal evolution
+  - n-body simulations
+  - REBOUND
+  - REBOUNDx
+preferred-citation:
+  type: article
+  title: "Tidal evolution of packed moon systems around an Earth-mass planet"
+  authors:
+    - family-names: Briseno
+      given-names: Alan
+    - family-names: Quarles
+      given-names: Billy
+    - family-names: Rosario-Franco
+      given-names: Marialis
+  journal: "The Astrophysical Journal"
+  year: 2026
+  notes: "Forthcoming. Add volume, issue, pages/article number, DOI, and ADS bibcode after publication."

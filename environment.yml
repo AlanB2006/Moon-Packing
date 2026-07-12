@@ -1,0 +1,14 @@
+name: moon-packing
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy=1.26
+  - scipy=1.13
+  - matplotlib=3.8
+  - pytest=8
+  - pip
+  - pip:
+      - rebound==4.4.6
+      - reboundx==4.4.1
+      - -e .
